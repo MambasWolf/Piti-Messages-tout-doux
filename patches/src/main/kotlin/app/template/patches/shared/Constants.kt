@@ -9,16 +9,20 @@ object Constants {
         name = "XYZ app",
         packageName = "com.example.app",
         apkFileType = ApkFileType.APK,
-        appIconColor = 0xFF0045, // Icon color in Morphe Manager
+        appIconColor = 0xFF0045,
         targets = listOf(
-            // "version = null" means the patch works with the latest app target
-            // and is expected to work with all future app targets
-            AppTarget(
-                version = "2.0.0"
-            ),
-            AppTarget(
-                version = "1.0.2",
-            )
+            AppTarget(version = "2.0.0"),
+            AppTarget(version = "1.0.2")
+        )
+    )
+
+    val COMPATIBILITY_INSTAGRAM = Compatibility(
+        name = "Instagram",
+        packageName = "com.instagram.android",
+        apkFileType = ApkFileType.APK,
+        appIconColor = 0xE1306C,
+        targets = listOf(
+            AppTarget(version = "430.0.0.53.80")
         )
     )
 }
