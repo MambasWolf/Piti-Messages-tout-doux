@@ -1,14 +1,6 @@
 group = "app.mambaswolf.patches"
 
-about {
-    name = "Piti messages tout doux"
-    description = "Affiche un message quand on clique sur l'onglet Reels"
-    source = "https://github.com/MambasWolf/Piti-Messages-tout-doux"
-    author = "MambasWolf"
-    contact = ""
-    website = "https://github.com/MambasWolf/Piti-Messages-tout-doux"
-    license = "GNU General Public License v3.0"
-}
+
 
 patches {
     about {
