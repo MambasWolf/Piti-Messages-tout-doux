@@ -1,44 +1,44 @@
-package app.template.extension;
+package app.template.patches.instagram
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
+import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.fingerprint.Fingerprint
+import app.morphe.patcher.compatibility.Compatibility
+import app.morphe.patcher.compatibility.AppTarget
 
-import java.util.Random;
+val INSTAGRAM_COMPATIBILITY = Compatibility(
+    name = "Instagram",
+    packageName = "com.instagram.android",
+    targets = listOf(
+        AppTarget(version = "430.0.0.53.80")
+    )
+)
 
-public class ReelsToastHelper {
+val reelsToastPatch = bytecodePatch(
+    name = "Reels tab toast",
+    description = "Affiche un petit message quand on clique sur l'onglet Reels",
+    default = true
+) {
+    compatibleWith(INSTAGRAM_COMPATIBILITY)
 
-    private static final String[] MESSAGES = {
-        "Crotte de pigeon. Vas pas ici.",
-        "Tu vaux mieux que ça.",
-        "Je veux pas être boomer. Mais va toucher de l'herbe.",
-        "Va manger des haricots verts.",
-        "Vas boire de l'eau au moins.",
-        "Tu as installé un truc pour pas faire ça. Et tu le fais quand même.",
-        "Tu as déverrouillé ton téléphone 23 fois aujourd'hui. Cherche pas pourquoi.",
-        "Quelqu'un t'a mis ce message exprès. Tu vois qui c'est.",
-        "T'es chiante.",
-        "Cet algorithme te connaît mieux que ta mère.",
-        "Appuie sur retour. Ose.",
-        "Batterie cérébrale : 3%",
-        "Connexion à la réalité perdue depuis 47 minutes.",
-        "T'as vraiment rien de mieux à faire hein.",
-        "Ptn lâche ces reels. Arrête de Scroll.",
-        "Tu pourrais être en train de faire quelque chose de ta vie."
-    };
+    extendWith("reels-toast.mpe")
 
-    private static final Random RANDOM = new Random();
+    execute {
+        val reelsTabClickFingerprint = Fingerprint(
+            returnType = "V",
+            parameters = listOf("Landroid/view/View;"),
+            strings = listOf(
+                "ON_CLICK_HANLDER_INVOKED",
+                "MainTabControllerImpl.onTabUpdated: "
+            )
+        )
 
-    public static void showToast(Context context) {
-        if (context == null) return;
-        final String message = MESSAGES[RANDOM.nextInt(MESSAGES.length)];
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-        } else {
-            new Handler(Looper.getMainLooper()).post(() ->
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            );
-        }
+        // Injection à l'index 40 : juste avant le dispatch sur l'onglet Reels
+        // v3 = InstagramMainActivity (Context), disponible depuis l'instruction [19]
+        reelsTabClickFingerprint.method.addInstructions(
+            40,
+            """
+                invoke-static {v3}, Lapp/template/extension/ReelsToastHelper;->showToast(Landroid/content/Context;)V
+            """
+        )
     }
 }
