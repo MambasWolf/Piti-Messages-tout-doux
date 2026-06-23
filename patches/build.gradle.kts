@@ -1,15 +1,13 @@
 group = "app.mambaswolf.patches"
 
-
-
 patches {
     about {
-        name = "UserXYZ Patches"
-        description = "Patches for apps I like"
-        source = "git@github.com:UserXYZ/morphe-patches.git"
-        author = "Awesome dev"
+        name = "Piti Messages Tout Doux"
+        description = "Affiche un message quand on clique sur l'onglet Reels"
+        source = "https://github.com/MambasWolf/Piti-Messages-tout-doux"
+        author = "MambasWolf"
         contact = "na"
-        website = "na"
+        website = "https://github.com/MambasWolf/Piti-Messages-tout-doux"
         license = "GPLv3"
     }
 }
@@ -20,8 +18,6 @@ kotlin {
     }
 }
 
-// Separate configuration so gson is available at runtime for the
-// generatePatchesList task but never bundled into the APK.
 val patchListGeneratorClasspath: Configuration by configurations.creating
 
 dependencies {
@@ -32,14 +28,11 @@ dependencies {
 tasks {
     register<JavaExec>("generatePatchesList") {
         description = "Build patch with patch list"
-
         dependsOn(build)
-
         classpath = sourceSets["main"].runtimeClasspath + patchListGeneratorClasspath
         mainClass.set("util.PatchListGeneratorKt")
     }
 
-    // Used by gradle-semantic-release-plugin.
     publish {
         dependsOn("generatePatchesList")
     }
