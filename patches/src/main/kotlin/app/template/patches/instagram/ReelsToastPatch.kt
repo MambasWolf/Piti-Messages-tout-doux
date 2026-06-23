@@ -1,43 +1,26 @@
 package app.template.patches.instagram
 
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.patcher.fingerprint.Fingerprint
-import app.morphe.patcher.compatibility.Compatibility
-import app.morphe.patcher.compatibility.AppTarget
+import app.template.patches.shared.Constants.COMPATIBILITY_INSTAGRAM
 
-val INSTAGRAM_COMPATIBILITY = Compatibility(
-    name = "Instagram",
-    packageName = "com.instagram.android",
-    targets = listOf(
-        AppTarget(version = "430.0.0.53.80")
-    )
-)
+private const val EXTENSION_CLASS = "Lapp/template/extension/extension/ReelsToastHelper;"
 
+@Suppress("unused")
 val reelsToastPatch = bytecodePatch(
     name = "Reels tab toast",
     description = "Affiche un petit message quand on clique sur l'onglet Reels",
     default = true
 ) {
-    compatibleWith(INSTAGRAM_COMPATIBILITY)
+    compatibleWith(COMPATIBILITY_INSTAGRAM)
 
-    extendWith("reels-toast.mpe")
+    extendWith("extensions/extension.mpe")
 
     execute {
-        val reelsTabClickFingerprint = Fingerprint(
-            returnType = "V",
-            parameters = listOf("Landroid/view/View;"),
-            strings = listOf(
-                "ON_CLICK_HANLDER_INVOKED",
-                "MainTabControllerImpl.onTabUpdated: "
-            )
-        )
-
-        // Injection à l'index 40 : juste avant le dispatch sur l'onglet Reels
-        // v3 = InstagramMainActivity (Context), disponible depuis l'instruction [19]
-        reelsTabClickFingerprint.method.addInstructions(
+        ReelsTabClickFingerprint.method.addInstructions(
             40,
             """
-                invoke-static {v3}, Lapp/template/extension/ReelsToastHelper;->showToast(Landroid/content/Context;)V
+                invoke-static {v3}, $EXTENSION_CLASS->showToast(Landroid/content/Context;)V
             """
         )
     }
